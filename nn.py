@@ -1,39 +1,25 @@
 #! ./.venv/bin/python
 
-from mnist import load_mnist
 
 import numpy as np
 
-def relu(x):
-    return 0 if x < 0 else x
-
-vrelu = np.vectorize(relu)
-
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
-vsigmoid = np.vectorize(sigmoid)
-
-def softmax(x):
-    exps = [np.exp(i) for i in x]
-    total = np.sum(exps)
-    return np.array([e / total for e in exps])
+from mnist import load_mnist
+from activation import softmax_grad, softmax, vsigmoid, vsigmoid_grad
 
 class Layer:
     def __init__(self,n_input,n_output):
         self.weights = np.zeros([n_output,n_input])
         self.biases = np.zeros(n_output)
         self.activation = vsigmoid
+        self.activation_grad = vsigmoid_grad
 
     def randomize(self):
         self.weights = np.random.rand(*self.weights.shape)
         self.biases = np.random.rand(self.weights.shape[0])
 
     def process(self,z):
-        print(z.shape)
-        print(self.weights.shape)
-        print(self.biases.shape)
-        return self.activation(np.matmul(self.weights, z) + self.biases)
+        z_new = np.matmul(self.weights, z) + self.biases
+        return self.activation(z_new), self.activation_grad(z_new)
 
 class FeedForwardNeuralNetwork:
     def __init__(self):
@@ -46,9 +32,13 @@ def main():
     l = Layer(28*28,10)
     l.randomize()
     l.activation = softmax
-    y = l.process(train_X[0].flatten())
+    l.activation_grad = softmax_grad
+    y, y_grad = l.process(train_X[0].flatten())
 
     print(y)
+    print(y_grad)
+    print(np.sum(y))
+    print(np.sum(y_grad))
 
 
 

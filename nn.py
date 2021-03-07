@@ -14,19 +14,26 @@ def sigmoid(x):
 
 vsigmoid = np.vectorize(sigmoid)
 
+def softmax(x):
+    exps = [np.exp(i) for i in x]
+    total = np.sum(exps)
+    return np.array([e / total for e in exps])
 
 class Layer:
     def __init__(self,n_input,n_output):
-        self.weights = np.zeros([n_input,n_output])
+        self.weights = np.zeros([n_output,n_input])
         self.biases = np.zeros(n_output)
-        self.activation = "RELU"
+        self.activation = vsigmoid
 
-    def randomize():
-        self.weights = np.random.rand(n_input,n_output)
-        self.biases = nprandom.rand(n_output)
+    def randomize(self):
+        self.weights = np.random.rand(*self.weights.shape)
+        self.biases = np.random.rand(self.weights.shape[0])
 
-    def process(z):
-        np.matmul(self.weights, z) + self.biases
+    def process(self,z):
+        print(z.shape)
+        print(self.weights.shape)
+        print(self.biases.shape)
+        return self.activation(np.matmul(self.weights, z) + self.biases)
 
 class FeedForwardNeuralNetwork:
     def __init__(self):
@@ -36,13 +43,12 @@ def main():
     print("Hello World")
     (train_X, train_Y), (test_X, test_Y) = load_mnist()
 
-    print(vsigmoid(train_X[0].flatten()))
+    l = Layer(28*28,10)
+    l.randomize()
+    l.activation = softmax
+    y = l.process(train_X[0].flatten())
 
-    #l = Layer(28*28,10)
-    #l.randomize()
-    #y = l.process(train_X[0].flatten())
-
-    #print(vsigmoidy)
+    print(y)
 
 
 

@@ -1,2 +1,3 @@
 .venv/
 mnist
+__pycache__/

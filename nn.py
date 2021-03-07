@@ -1,32 +1,48 @@
 #! ./.venv/bin/python
 
-from keras.datasets import mnist
+from mnist import load_mnist
+
 import numpy as np
-from matplotlib import pyplot as plt
 
-def load_mnist():
-    
-    (train_X, train_Y), (test_X, test_Y) = mnist.load_data()
+def relu(x):
+    return 0 if x < 0 else x
 
-    train_X = np.array(train_X) / 256
-    test_X = np.array(test_X) / 256
+vrelu = np.vectorize(relu)
 
-    def convert_y(y_data):
-        y_lol = [[int(i == j) for j in range(10)] for i in y_data]
-        return np.array(y_lol)
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
 
-    train_Y = convert_y(train_Y)
-    test_Y = convert_y(test_Y)
-
-    print(test_Y[-2::])
+vsigmoid = np.vectorize(sigmoid)
 
 
-    plt.imshow(train_X[0])
-    plt.show()
+class Layer:
+    def __init__(self,n_input,n_output):
+        self.weights = np.zeros([n_input,n_output])
+        self.biases = np.zeros(n_output)
+        self.activation = "RELU"
+
+    def randomize():
+        self.weights = np.random.rand(n_input,n_output)
+        self.biases = nprandom.rand(n_output)
+
+    def process(z):
+        np.matmul(self.weights, z) + self.biases
+
+class FeedForwardNeuralNetwork:
+    def __init__(self):
+        pass
 
 def main():
     print("Hello World")
-    load_mnist()
+    (train_X, train_Y), (test_X, test_Y) = load_mnist()
+
+    print(vsigmoid(train_X[0].flatten()))
+
+    #l = Layer(28*28,10)
+    #l.randomize()
+    #y = l.process(train_X[0].flatten())
+
+    #print(vsigmoidy)
 
 
 

@@ -40,13 +40,11 @@ def loss(y_pred, y_actual):
     y_actual : vector of actual probabilities (may be [0,...,1,...,0])
     y_pred : vector of probabilityies
     """
-    return np.sum(  )
+    return -1 * np.sum( y_actual * np.log(y_pred), axis=1 )
 
 def main():
     print("Hello World")
     (train_X, train_Y), (test_X, test_Y) = load_mnist()
-
-    print(train_Y[0])
 
     """
     Build neural network architecture
@@ -67,10 +65,14 @@ def main():
     Evaluate a few data points
     """
 
-    p = nn.process(train_X[0:2:])
-    print(p)
+    x_data = train_X[0:5]
+    y_data = train_Y[0:5]
 
-    #print(p)
+    p = nn.process(x_data)
+    my_loss = loss(p, y_data)
+
+    print(p)
+    print(my_loss)
     #print(sum(p))
 
 

@@ -25,13 +25,14 @@ class FeedForwardNeuralNetwork:
     def __init__(self):
         self.layers = []
 
-    def process(self,x):
-        for l in self.layers:
-            x, gradx = l.process(x)
+    def process(self,x_mat):
 
-        return x
+        def jjj(x):
+            for l in self.layers:
+                x, gradx = l.process(x)
+            return x
 
-
+        return np.array([jjj(x_vec) for x_vec in x_mat])
 
 
 def loss(y_pred, y_actual):
@@ -47,6 +48,10 @@ def main():
 
     print(train_Y[0])
 
+    """
+    Build neural network architecture
+    """
+
     l1 = Layer(28*28,32)
     l1.randomize()
 
@@ -58,14 +63,12 @@ def main():
     nn = FeedForwardNeuralNetwork()
     nn.layers = [l1,l2]
 
-    x = train_X[0]
-    y = train_Y[0]
-    print(x)
-    print(y)
+    """
+    Evaluate a few data points
+    """
 
-    p = nn.process(train_X[0].flatten())
-
-    loss =
+    p = nn.process(train_X[0:2:])
+    print(p)
 
     #print(p)
     #print(sum(p))

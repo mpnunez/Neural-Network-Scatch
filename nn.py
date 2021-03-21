@@ -23,22 +23,52 @@ class Layer:
 
 class FeedForwardNeuralNetwork:
     def __init__(self):
-        pass
+        self.layers = []
+
+    def process(self,x):
+        for l in self.layers:
+            x, gradx = l.process(x)
+
+        return x
+
+
+
+
+def loss(y_pred, y_actual):
+    """
+    y_actual : vector of actual probabilities (may be [0,...,1,...,0])
+    y_pred : vector of probabilityies
+    """
+    return np.sum(  )
 
 def main():
     print("Hello World")
     (train_X, train_Y), (test_X, test_Y) = load_mnist()
 
-    l = Layer(28*28,10)
-    l.randomize()
-    l.activation = softmax
-    l.activation_grad = softmax_grad
-    y, y_grad = l.process(train_X[0].flatten())
+    print(train_Y[0])
 
+    l1 = Layer(28*28,32)
+    l1.randomize()
+
+    l2 = Layer(32,10)
+    l2.randomize()
+    l2.activation = softmax
+    l2.activation_grad = softmax_grad
+
+    nn = FeedForwardNeuralNetwork()
+    nn.layers = [l1,l2]
+
+    x = train_X[0]
+    y = train_Y[0]
+    print(x)
     print(y)
-    print(y_grad)
-    print(np.sum(y))
-    print(np.sum(y_grad))
+
+    p = nn.process(train_X[0].flatten())
+
+    loss =
+
+    #print(p)
+    #print(sum(p))
 
 
 

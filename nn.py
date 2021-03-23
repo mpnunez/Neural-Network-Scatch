@@ -4,14 +4,13 @@
 import numpy as np
 
 from mnist import load_mnist
-from activation import softmax_grad, softmax, vsigmoid, vsigmoid_grad
+from activation import softmax, sigmoid
 
 class Layer:
     def __init__(self,n_input,n_output):
         self.weights = np.zeros([n_output,n_input])
         self.biases = np.zeros(n_output)
-        self.activation = vsigmoid
-        self.activation_grad = vsigmoid_grad
+        self.activation = sigmoid
 
     def randomize(self):
         self.weights = np.random.rand(*self.weights.shape)
@@ -19,7 +18,7 @@ class Layer:
 
     def process(self,z):
         z_new = np.matmul(self.weights, z) + self.biases
-        return self.activation(z_new), self.activation_grad(z_new)
+        return self.activation(z_new)
 
 class FeedForwardNeuralNetwork:
     def __init__(self):
@@ -30,9 +29,12 @@ class FeedForwardNeuralNetwork:
 
         z_outputs = [None for l in self.layers]
         z_grads = [None for l in self.layers]
+        z = x
 
-        for l in self.layers:
-            x, gradx = l.process(x)
+        for l in enumerate(self.layers):
+            z_outputs[i], z_grads[i] = l.process(z)
+            z = z_outputs[i]
+
         return x
 
     def process(self,x_mat,y_mat):
@@ -43,9 +45,15 @@ class FeedForwardNeuralNetwork:
 def loss(y_pred, y_actual):
     """
     y_actual : vector of actual probabilities (may be [0,...,1,...,0])
-    y_pred : vector of probabilityies
+    y_pred : vector of probabilities
+
+    Need to also return derivative of loss for each y
+
     """
-    return -1 * np.sum( y_actual * np.log(y_pred), axis=1 )
+
+    loss = -1 * np.sum( y_actual * np.log(y_pred), axis=1 )
+
+    return
 
 def main():
     print("Hello World")
@@ -61,7 +69,6 @@ def main():
     l2 = Layer(32,10)
     l2.randomize()
     l2.activation = softmax
-    l2.activation_grad = softmax_grad
 
     nn = FeedForwardNeuralNetwork()
     nn.layers = [l1,l2]

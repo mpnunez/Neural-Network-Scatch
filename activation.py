@@ -4,32 +4,27 @@ Activation functions
 
 import numpy as np
 
-def relu(x):
-    return 0 if x < 0 else x
-
-vrelu = np.vectorize(relu)
-
-def relu_grad(x):
-    return 0 if x < 0 else 1
-
-vrelu_grad = np.vectorize(relu_grad)
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    """
+    Sigmoid activation function
+    """
 
-vsigmoid = np.vectorize(sigmoid)
+    exps = np.exp(-x)
+    final = 1 / (1 + exps)
+    J = np.diag(exps / (1 + exps) ** 2)
 
-def sigmoid_grad(x):
-    return np.exp(x) / (1 + np.exp(-x)) ** 2
+    return final, J
 
-vsigmoid_grad = np.vectorize(sigmoid_grad)
 
 def softmax(x):
-    exps = [np.exp(i) for i in x]
-    total = np.sum(exps)
-    return np.array([e / total for e in exps])
+    """
+    Softmax activation function
+    """
 
-def softmax_grad(x):
-    exps = [np.exp(i) for i in x]
-    total = np.sum(exps)
-    return np.array([(total * e - e ** 2) / total**2 for e in exps]) / total**2
+    exps = np.exp(x)
+    exps_sum = np.sum(exps)
+    final = exps / exps_sum
+    J = (exps_sum * np.diag(exps) - np.outer(exps,exps) ) / exps_sum ** 2
+
+    return final, J

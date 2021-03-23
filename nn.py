@@ -24,15 +24,20 @@ class Layer:
 class FeedForwardNeuralNetwork:
     def __init__(self):
         self.layers = []
+        self.learning_rate = 0.01
 
-    def process(self,x_mat):
+    def compute_data_point(self,x):
 
-        def jjj(x):
-            for l in self.layers:
-                x, gradx = l.process(x)
-            return x
+        z_outputs = [None for l in self.layers]
+        z_grads = [None for l in self.layers]
 
-        return np.array([jjj(x_vec) for x_vec in x_mat])
+        for l in self.layers:
+            x, gradx = l.process(x)
+        return x
+
+    def process(self,x_mat,y_mat):
+
+        return np.array([compute_data_point(self.x_vec) for x_vec in x_mat])
 
 
 def loss(y_pred, y_actual):

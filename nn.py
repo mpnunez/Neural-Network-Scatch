@@ -197,7 +197,7 @@ def train_mnist():
     Build neural network architecture
     """
 
-    n_nodes_first_hidden_layer=10
+    n_nodes_first_hidden_layer=32
 
     l1 = Layer(28*28,n_nodes_first_hidden_layer)
     l1.randomize()

@@ -3,7 +3,7 @@
 
 import numpy as np
 
-#from mnist import load_mnist
+from mnist import load_mnist
 from loss import categorical_cross_entropy_loss
 from activation import softmax, sigmoid
 from tqdm import tqdm
@@ -136,8 +136,13 @@ class FeedForwardNeuralNetwork:
 
         loss_history = np.zeros([n_batches,self.epochs])
 
+        print("\nStarting training")
+        print("{} samples".format(n_data))
+        print("{} epochs".format(self.epochs))
+        print("{} batches".format(n_batches))
+
         for epoch in tqdm(range(self.epochs)):
-            for batch in range(n_batches):
+            for batch in tqdm(range(n_batches)):
 
                 X_batch = X[self.batch_size*batch:self.batch_size*(batch+1)]
                 Y_batch = Y[self.batch_size*batch:self.batch_size*(batch+1)]
@@ -184,7 +189,41 @@ def train_toy():
 
     nn.train(train_X, train_Y)
 
+def train_mnist():
+    print("Hello World")
+    (train_X, train_Y), (test_X, test_Y) = load_mnist()
 
+    """
+    Build neural network architecture
+    """
+
+    n_nodes_first_hidden_layer=10
+
+    l1 = Layer(28*28,n_nodes_first_hidden_layer)
+    l1.randomize()
+
+    l2 = Layer(n_nodes_first_hidden_layer,10)
+    l2.randomize()
+    l2.activation = softmax
+
+    nn = FeedForwardNeuralNetwork(
+        batch_size = 600,
+        epochs = 100,
+        learning_rate = 1.0)
+    nn.layers = [l1,l2]
+
+    """
+    Evaluate a few data points
+    """
+
+    nn.train(train_X, train_Y)
+    import pickle
+    pickle.dump( nn, open( "nn.p", "wb" ) )
+
+    # test_pred_Y = nn.predict(test_X)
+    # test_pred_Y = np.round(test_pred_Y)
+    # frac_wrong = np.sum(test_pred_Y - test_Y)
+    # print("Fraction wrong: {}".format(frac_wrong))
 
 if __name__ == "__main__":
-    train_toy()
+    train_mnist()

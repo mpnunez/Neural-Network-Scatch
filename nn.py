@@ -106,18 +106,24 @@ class FeedForwardNeuralNetwork:
             # for the weight
             dldz = dldx[:-1]
 
+        return loss
+
 
     def train_batch(self,X_batch,Y_batch):
         """
         Train on a batch
         """
 
+        average_loss = 0
         for x, y in zip(X_batch, Y_batch):
-            self.train_datum(x,y)
+            datum_loss = self.train_datum(x,y)
+            average_loss += datum_loss / self.batch_size
 
         # Update weights on all layers after processing the batch
         for l in self.layers:
             l.update_weights()
+
+        return average_loss
 
     def train(self,X,Y):
         """
@@ -132,7 +138,8 @@ class FeedForwardNeuralNetwork:
 
                 X_batch = X[self.batch_size*batch:self.batch_size*(batch+1)]
                 Y_batch = Y[self.batch_size*batch:self.batch_size*(batch+1)]
-                self.train_batch(X_batch,Y_batch)
+                loss = self.train_batch(X_batch,Y_batch)
+                print(loss)
 
 
 def main():
@@ -152,8 +159,8 @@ def main():
 
     nn = FeedForwardNeuralNetwork(
         batch_size = 10,
-        epochs = 10,
-        learning_rate = 0.01)
+        epochs = 1000,
+        learning_rate = 0.1)
     nn.layers = [l1,l2]
 
     """

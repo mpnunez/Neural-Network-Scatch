@@ -3,10 +3,11 @@
 
 import numpy as np
 
-from mnist import load_mnist
+#from mnist import load_mnist
 from loss import categorical_cross_entropy_loss
 from activation import softmax, sigmoid
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 class Layer:
     """
@@ -16,7 +17,7 @@ class Layer:
     def __init__(self,n_input,n_output):
 
         # Add 1 to input nodes for biases
-        self.weights = np.zeros([n_output,n_input+1])
+        self.weights = np.zeros([n_output,n_input+1]) - 0.5
         self.loss_grads = np.zeros(self.weights.shape)
         self.activation = sigmoid
 
@@ -125,13 +126,15 @@ class FeedForwardNeuralNetwork:
 
         return average_loss
 
-    def train(self,X,Y):
+    def train(self,X,Y,show_loss_history=True):
         """
         Train on an entire data set
         """
 
-        n_data = X.shape[1]
+        n_data = len(X)
         n_batches = int(n_data / self.batch_size)
+
+        loss_history = np.zeros([n_batches,self.epochs])
 
         for epoch in tqdm(range(self.epochs)):
             for batch in range(n_batches):
@@ -139,28 +142,40 @@ class FeedForwardNeuralNetwork:
                 X_batch = X[self.batch_size*batch:self.batch_size*(batch+1)]
                 Y_batch = Y[self.batch_size*batch:self.batch_size*(batch+1)]
                 loss = self.train_batch(X_batch,Y_batch)
-                print(loss)
 
+                loss_history[batch,epoch] = loss
 
-def main():
+        if show_loss_history:
+            loss_history = np.mean(loss_history,axis=0)
+            n_epochs = np.array(range(len(loss_history))) + 1
+
+            plt.plot(n_epochs,loss_history)
+            plt.xlabel("Number of epochs")
+            plt.ylabel("Loss")
+            plt.show()
+
+def train_toy():
+
     print("Hello World")
-    (train_X, train_Y), (test_X, test_Y) = load_mnist()
+
+    train_X = np.array([[i] for i in range(-10,10)])
+    train_Y = np.array([[int(x[0]<=5), int(x[0]>5)] for x in train_X])
 
     """
     Build neural network architecture
     """
 
-    l1 = Layer(28*28,32)
+    l1 = Layer(1,1)
     l1.randomize()
 
-    l2 = Layer(32,10)
+    l2 = Layer(1,2)
     l2.randomize()
     l2.activation = softmax
 
     nn = FeedForwardNeuralNetwork(
-        batch_size = 10,
+        batch_size = len(train_X),
         epochs = 1000,
-        learning_rate = 0.1)
+        learning_rate = 1.0)
     nn.layers = [l1,l2]
 
     """
@@ -168,11 +183,8 @@ def main():
     """
 
     nn.train(train_X, train_Y)
-    # test_pred_Y = nn.predict(test_X)
-    # test_pred_Y = np.round(test_pred_Y)
-    # frac_wrong = np.sum(test_pred_Y - test_Y)
-    # print("Fraction wrong: {}".format(frac_wrong))
+
 
 
 if __name__ == "__main__":
-    main()
+    train_toy()

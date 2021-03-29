@@ -11,7 +11,7 @@ def categorical_cross_entropy_loss(y_pred, y_actual):
 
     """
 
-    loss = -1 * np.sum( y_actual * np.log(y_pred), axis=int(len(y_pred.shape)==2) )
+    loss = -1 * np.sum( y_actual * np.log(y_pred) )
     J = - y_actual / y_pred
 
     return loss, J

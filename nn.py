@@ -17,7 +17,7 @@ class Layer:
     def __init__(self,n_input,n_output):
 
         # Add 1 to input nodes for biases
-        self.weights = 10*(np.zeros([n_output,n_input+1]) - 0.5)
+        self.weights = np.zeros([n_output,n_input+1]) - 0.5
         self.loss_grads = np.zeros(self.weights.shape)
         self.activation = sigmoid
 
@@ -26,7 +26,7 @@ class Layer:
         """
         Initialize weights with random numbers between 0 and 1
         """
-        self.weights = np.random.rand(*self.weights.shape)
+        self.weights = np.random.rand(*self.weights.shape) - 0.5
 
     def propagate(self,z):
         """
@@ -230,15 +230,14 @@ def train_mnist():
     l2.randomize()
     l2.activation = softmax
 
-    train_X = train_X[::1000]
-    train_Y = train_Y[::1000]
+    #train_X = train_X[::100]
+    #train_Y = train_Y[::100]
 
 
     nn = FeedForwardNeuralNetwork(
-        batch_size = len(train_X),
-        #epochs = 100,
-        epochs = 200,
-        learning_rate = 0.01)
+        batch_size = 100,
+        epochs = 100,
+        learning_rate = 1.0)
     nn.layers = [l1,l2]
 
     cm_pre = nn.confusion_matrix(train_X,train_Y)
@@ -249,8 +248,19 @@ def train_mnist():
     """
 
     nn.train(train_X, train_Y)
+
+    print("\nConfusion matrix for training set")
     cm_post = nn.confusion_matrix(train_X,train_Y)
     print(cm_post)
+
+    train_acc = np.sum(np.diag(cm_post)) / np.sum(cm_post)
+    print("Training accuracy: {}".format(train_acc))
+
+    print("\nConfusion matrix for test set")
+    cm_test = nn.confusion_matrix(test_X,test_Y)
+    print(cm_test)
+    test_acc = np.sum(np.diag(cm_test)) / np.sum(cm_test)
+    print("Test accuracy: {}".format(test_acc))
 
     import pickle
     pickle.dump( nn, open( "nn.p", "wb" ) )

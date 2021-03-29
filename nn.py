@@ -17,7 +17,7 @@ class Layer:
     def __init__(self,n_input,n_output):
 
         # Add 1 to input nodes for biases
-        self.weights = np.zeros([n_output,n_input+1]) - 0.5
+        self.weights = 10*(np.zeros([n_output,n_input+1]) - 0.5)
         self.loss_grads = np.zeros(self.weights.shape)
         self.activation = sigmoid
 
@@ -73,6 +73,30 @@ class FeedForwardNeuralNetwork:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.layers = []
+
+    def predict_datum(self,x):
+        #print(x)
+        z = x
+
+        # Forward propagate
+        for i, l in enumerate(self.layers):
+            z, z_grads = l.propagate(z)
+
+        return z
+
+    def predict(self,X):
+        return np.array([self.predict_datum(x) for x in X])
+
+    def confusion_matrix(self,X,Y):
+        pred_Y = self.predict(X)
+
+        d = len(Y[0])
+        cm = np.zeros((d,d))
+        for yp,ya in zip(pred_Y,Y):
+            predicted_value = np.argmax(yp)
+            actual_value = np.argmax(ya)
+            cm[actual_value,predicted_value] += 1
+        return cm
 
     def train_datum(self,x,y):
 
@@ -197,7 +221,7 @@ def train_mnist():
     Build neural network architecture
     """
 
-    n_nodes_first_hidden_layer=32
+    n_nodes_first_hidden_layer=10
 
     l1 = Layer(28*28,n_nodes_first_hidden_layer)
     l1.randomize()
@@ -206,19 +230,35 @@ def train_mnist():
     l2.randomize()
     l2.activation = softmax
 
+    train_X = train_X[::1000]
+    train_Y = train_Y[::1000]
+
+
     nn = FeedForwardNeuralNetwork(
-        batch_size = 600,
-        epochs = 100,
-        learning_rate = 1.0)
+        batch_size = len(train_X),
+        #epochs = 100,
+        epochs = 200,
+        learning_rate = 0.01)
     nn.layers = [l1,l2]
+
+    cm_pre = nn.confusion_matrix(train_X,train_Y)
+    print(cm_pre)
 
     """
     Evaluate a few data points
     """
 
     nn.train(train_X, train_Y)
+    cm_post = nn.confusion_matrix(train_X,train_Y)
+    print(cm_post)
+
     import pickle
     pickle.dump( nn, open( "nn.p", "wb" ) )
+
+
+
+    #train_Y_pred = nn.predict(train_X)
+
 
     # test_pred_Y = nn.predict(test_X)
     # test_pred_Y = np.round(test_pred_Y)
